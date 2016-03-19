@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['m_5fpi',['M_PI',['../colorspace_8c.html#ae71449b1cc6e6250b91f539153a7a0d3',1,'colorspace.c']]],
+  ['mask_5fout_5fartifacts_5fprocessor',['mask_out_artifacts_Processor',['../classmask__out__artifacts__Processor.html',1,'']]],
+  ['matrix44',['matrix44',['../structmatrix44.html',1,'']]],
+  ['max',['MAX',['../colorspace_8c.html#ad935f1ff1a50822e317bdb321ce991ad',1,'colorspace.c']]],
+  ['max3',['MAX3',['../colorspace_8c.html#a8d577123d2e66d2b7d0bf9af6e172b93',1,'colorspace.c']]],
+  ['mountainlab',['MountainLab',['../md_README.html',1,'']]],
+  ['mda',['Mda',['../classMda.html',1,'']]],
+  ['mda2txt_5fprocessor',['mda2txt_Processor',['../classmda2txt__Processor.html',1,'']]],
+  ['mdaio_5fheader',['MDAIO_HEADER',['../structMDAIO__HEADER.html',1,'']]],
+  ['min',['MIN',['../colorspace_8c.html#adcd021ac91d43a62b2cdecf9a5b971a7',1,'colorspace.c']]],
+  ['min3',['MIN3',['../colorspace_8c.html#a721b8d5f3abef17f10293f1f7f8c958e',1,'colorspace.c']]],
+  ['msprocessmanager',['MSProcessManager',['../classMSProcessManager.html',1,'']]],
+  ['msprocessor',['MSProcessor',['../classMSProcessor.html',1,'']]],
+  ['mvcdfview',['MVCdfView',['../classMVCdfView.html',1,'']]],
+  ['mvclipsview',['MVClipsView',['../classMVClipsView.html',1,'']]],
+  ['mvclusterdetailwidget',['MVClusterDetailWidget',['../classMVClusterDetailWidget.html',1,'']]],
+  ['mvclusterview',['MVClusterView',['../classMVClusterView.html',1,'']]],
+  ['mvclusterwidget',['MVClusterWidget',['../classMVClusterWidget.html',1,'']]],
+  ['mvcrosscorrelogramswidget',['MVCrossCorrelogramsWidget',['../classMVCrossCorrelogramsWidget.html',1,'']]],
+  ['mvevent',['MVEvent',['../structMVEvent.html',1,'']]],
+  ['mvfiringrateview',['MVFiringRateView',['../classMVFiringRateView.html',1,'']]],
+  ['mvlabelcomparewidget',['MVLabelCompareWidget',['../classMVLabelCompareWidget.html',1,'']]],
+  ['mvoverview2widget',['MVOverview2Widget',['../classMVOverview2Widget.html',1,'']]],
+  ['mvoverview2widgetcontrolpanel',['MVOverview2WidgetControlPanel',['../classMVOverview2WidgetControlPanel.html',1,'']]],
+  ['mvstatisticswidget',['MVStatisticsWidget',['../classMVStatisticsWidget.html',1,'']]]
+];

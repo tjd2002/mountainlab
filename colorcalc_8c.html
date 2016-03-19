@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>MountainLab: Main Page</title>
+<title>MountainLab: matlab/view/colorspace/colorcalc.c File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -36,11 +36,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
+      <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -59,7 +59,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-</div><!-- top -->
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+    </ul>
+  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -74,12 +79,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_363c7dd63633bc0b67762e7ff7b5a8f6.html">matlab</a></li><li class="navelem"><a class="el" href="dir_823563688433077e055ca8e8fbfc94a2.html">view</a></li><li class="navelem"><a class="el" href="dir_8c0976c6ebdb44792b1fdd9d05e035fd.html">colorspace</a></li>  </ul>
+</div>
+</div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">MountainLab Documentation</div>  </div>
+<div class="title">colorcalc.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-</div><!-- contents -->
+<div class="textblock"><code>#include &lt;stdio.h&gt;</code><br/>
+<code>#include &lt;stdlib.h&gt;</code><br/>
+<code>#include &quot;<a class="el" href="colorspace_8h_source.html">colorspace.h</a>&quot;</code><br/>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a0ddf1224851353fc92bfbff6f499fa97"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0ddf1224851353fc92bfbff6f499fa97"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>main</b> (int argc, char *argv[])</td></tr>
+<tr class="separator:a0ddf1224851353fc92bfbff6f499fa97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><dl class="section author"><dt>Author</dt><dd>Pascal Getreuer 2010 <a href="#" onclick="location.href='mai'+'lto:'+'get'+'re'+'uer'+'@g'+'mai'+'l.'+'com'; return false;">getre<span style="display: none;">.nosp@m.</span>uer@<span style="display: none;">.nosp@m.</span>gmail<span style="display: none;">.nosp@m.</span>.com</a></dd></dl>
+<p>This is a small command line program to demonstrate <a class="el" href="colorspace_8c.html">colorspace.c</a>. The program accepts an sRGB color as input and transforms it to all the spaces supported by <a class="el" href="colorspace_8c.html">colorspace.c</a>.</p>
+<p>==Usage== The syntax for the program is colorcalc R G B where R, G, B are values between 0 and 1 specifying a color in the gamma- corrected sRGB color space. For example, colorcalc 0.5 0.85 0.61</p>
+<p>==Compiling Instructions== Compile the files <a class="el" href="colorcalc_8c.html">colorcalc.c</a> and <a class="el" href="colorspace_8c.html">colorspace.c</a> with an ANSI C compiler. The program is compiled with GCC by gcc <a class="el" href="colorcalc_8c.html">colorcalc.c</a> <a class="el" href="colorspace_8c.html">colorspace.c</a> -lm -o colorcalc </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated on Sat Mar 19 2016 04:15:13 for MountainLab by &#160;<a href="http://www.doxygen.org/index.html">

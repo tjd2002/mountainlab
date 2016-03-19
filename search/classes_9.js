@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['mask_5fout_5fartifacts_5fprocessor',['mask_out_artifacts_Processor',['../classmask__out__artifacts__Processor.html',1,'']]],
+  ['matrix44',['matrix44',['../structmatrix44.html',1,'']]],
+  ['mda',['Mda',['../classMda.html',1,'']]],
+  ['mda2txt_5fprocessor',['mda2txt_Processor',['../classmda2txt__Processor.html',1,'']]],
+  ['mdaio_5fheader',['MDAIO_HEADER',['../structMDAIO__HEADER.html',1,'']]],
+  ['msprocessmanager',['MSProcessManager',['../classMSProcessManager.html',1,'']]],
+  ['msprocessor',['MSProcessor',['../classMSProcessor.html',1,'']]],
+  ['mvcdfview',['MVCdfView',['../classMVCdfView.html',1,'']]],
+  ['mvclipsview',['MVClipsView',['../classMVClipsView.html',1,'']]],
+  ['mvclusterdetailwidget',['MVClusterDetailWidget',['../classMVClusterDetailWidget.html',1,'']]],
+  ['mvclusterview',['MVClusterView',['../classMVClusterView.html',1,'']]],
+  ['mvclusterwidget',['MVClusterWidget',['../classMVClusterWidget.html',1,'']]],
+  ['mvcrosscorrelogramswidget',['MVCrossCorrelogramsWidget',['../classMVCrossCorrelogramsWidget.html',1,'']]],
+  ['mvevent',['MVEvent',['../structMVEvent.html',1,'']]],
+  ['mvfiringrateview',['MVFiringRateView',['../classMVFiringRateView.html',1,'']]],
+  ['mvlabelcomparewidget',['MVLabelCompareWidget',['../classMVLabelCompareWidget.html',1,'']]],
+  ['mvoverview2widget',['MVOverview2Widget',['../classMVOverview2Widget.html',1,'']]],
+  ['mvoverview2widgetcontrolpanel',['MVOverview2WidgetControlPanel',['../classMVOverview2WidgetControlPanel.html',1,'']]],
+  ['mvstatisticswidget',['MVStatisticsWidget',['../classMVStatisticsWidget.html',1,'']]]
+];

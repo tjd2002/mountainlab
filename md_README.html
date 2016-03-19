@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>MountainLab: Main Page</title>
+<title>MountainLab: MountainLab</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -36,8 +36,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li class="current"><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -59,7 +59,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-</div><!-- top -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -74,12 +73,50 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+</div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">MountainLab Documentation</div>  </div>
+<div class="title">MountainLab </div>  </div>
 </div><!--header-->
 <div class="contents">
-</div><!-- contents -->
+<div class="textblock"><p>MountainLab is a collection of processing, visualization, and validation tools for spike sorting of electrophysiological recordings. It is under development by Jeremy Magland and Alex Barnett at the Simons Center for Data Analysis (SCDA).</p>
+<p>The software suite (in flux) comprises the following:</p>
+<ul>
+<li>MountainSort &ndash; Core C++ library for sorting of multi-electride recordings.</li>
+<li>MountainView &ndash; Collection of Qt/C++ widgets for visualizing generic electrophysiological datasets and sorting results.</li>
+<li>A Matlab toolset for processing, visualizing, and validating spike sorting data and a set of Matlab wrappers to MountainSort and MountainView.</li>
+</ul>
+<h2>License</h2>
+<p>This is open source software released under the terms of the GPLv3. For alternative licensing options, please contact <a href="#" onclick="location.href='mai'+'lto:'+'scd'+'ai'+'nfo'+'@s'+'imo'+'ns'+'fou'+'nd'+'ati'+'on'+'.or'+'g'; return false;">scdai<span style="display: none;">.nosp@m.</span>nfo@<span style="display: none;">.nosp@m.</span>simon<span style="display: none;">.nosp@m.</span>sfou<span style="display: none;">.nosp@m.</span>ndati<span style="display: none;">.nosp@m.</span>on.o<span style="display: none;">.nosp@m.</span>rg</a>.</p>
+<h2>Installation and Basic Usage</h2>
+<p>MountainLab has been developed and tested in Linux (Ubuntu and CentOS), but should also run (with some expertise) on any operating sytem that supports Qt/C++ such as Windows or Mac OS X. Much of the Matlab functionality is available without needing to install the C++ programs. C++ programs also run independently (without Matlab) from the command line.</p>
+<p>General instructions for all operating systems (see specifics below):</p>
+<ul>
+<li>Install git and clone this repository.</li>
+<li>Install Qt5 and Lapack development libraries.</li>
+<li>Compile MountainSort by running qmake and make from a terminal inside the mountainlab/mountainsort/src directory.</li>
+<li>Compile MountainView by running qmake and make from a terminal inside the mountainlab/mountainview/src directory.</li>
+<li>(Optional) From within Matlab navigate to mountainlab/matlab and run ms_setup_path.m.</li>
+</ul>
+<p>Several demo command-line and Matlab scripts are found in /demo and /matlab/demo, respectively.</p>
+<h2>Installation on Linux</h2>
+<p>Follow the above steps using the these hints along the way.</p>
+<p><b>Installation of git:</b> ```bash Ubuntu/Debian: sudo apt-get install git CentOS/Red Hat: sudo yum install git ```</p>
+<p><b>Installation of Qt5:</b></p>
+<p><a href="https://www.qt.io/download-open-source/">Download Qt5</a> (Follow the instructions for installing the open source version)</p>
+<p><b>Installation of Lapack:</b> ```bash Ubuntu/Debian: sudo apt-get install liblapack-dev CentOS/Red Hat: sudo yum install lapack-devel.x86_64 ```</p>
+<p><b>Compilation:</b> ```bash cd mountainsuite/mountainsort/src qmake make -j 8 ``` </p>
+<blockquote class="doxtable">
+<p>The "-j 8" tells make to use multiple cores to do the compilation, because we believe in speed</p>
+<p></p>
+</blockquote>
+<p><b>Opening Matlab:</b> ``` </p>
+<h1>First buy matlab</h1>
+<p>matlab ```</p>
+<h2>References</h2>
+<p><a href="http://www.ncbi.nlm.nih.gov/pubmed/26930629">Barnett, Alex H., Jeremy F. Magland, and Leslie F. Greengard. "Validation of Neural Spike Sorting Algorithms without Ground-truth Information." Journal of Neuroscience Methods 264 (2016): 65-77.</a> <a href="http://arxiv.org/abs/1508.06936">Link to arXiv</a></p>
+<p>Magland, Jeremy F., and Alex H. Barnett. Unimodal clustering using isotonic regression: ISO-SPLIT. <a href="http://arxiv.org/abs/1508.04841">Link to arXiv</a> </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated on Sat Mar 19 2016 04:15:13 for MountainLab by &#160;<a href="http://www.doxygen.org/index.html">
