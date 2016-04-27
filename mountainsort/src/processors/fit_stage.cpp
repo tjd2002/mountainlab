@@ -56,7 +56,7 @@ bool fit_stage(const QString& timeseries_path, const QString& firings_path, cons
     //while ((something_changed)&&(num_passes<2)) {
     while (something_changed) {
         num_passes++;
-        printf("pass %d... ", num_passes);
+        //printf("pass %d... ", num_passes);
         QList<double> scores_to_try;
         QList<double> times_to_try;
         QList<int> labels_to_try;
@@ -118,7 +118,7 @@ bool fit_stage(const QString& timeseries_path, const QString& firings_path, cons
                 all_to_use[inds_to_try[i]] = 1;
             }
         }
-        printf("added %ld events\n", num_added);
+        //printf("added %ld events\n", num_added);
     }
 
     long num_to_use = 0;

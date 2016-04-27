@@ -23,7 +23,7 @@ bool mask_out_artifacts(const QString &timeseries_path, const QString &timeserie
 	Mda norms(M,N/interval_size);
 	for (long i=0; i<N/interval_size; i++) {
 		long timepoint=i*interval_size;
-        if (status_timer.elapsed()>1000) {
+        if (status_timer.elapsed()>5000) {
             printf("mask_out_artifacts compute_norms: %ld/%ld (%d%%)\n",timepoint,N,(int)(timepoint*100.0/N));
             status_timer.restart();
         }
@@ -63,7 +63,7 @@ bool mask_out_artifacts(const QString &timeseries_path, const QString &timeserie
     DiskWriteMda Y; Y.open(MDAIO_TYPE_FLOAT32,timeseries_out_path,M,N);
 	for (long i=0; i<N/interval_size; i++) {
 		long timepoint=i*interval_size;
-        if (status_timer.elapsed()>1000) {
+        if (status_timer.elapsed()>5000) {
             printf("mask_out_artifacts write data: %ld/%ld (%d%%)\n",timepoint,N,(int)(timepoint*100.0/N));
             status_timer.restart();
         }
