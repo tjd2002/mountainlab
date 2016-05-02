@@ -7,10 +7,10 @@
 #ifndef TASKPROGRESSVIEW_H
 #define TASKPROGRESSVIEW_H
 
-#include <QWidget>
+#include <QTreeWidget>
 
 class TaskProgressViewPrivate;
-class TaskProgressView : public QWidget {
+class TaskProgressView : public QTreeWidget {
     Q_OBJECT
 public:
     friend class TaskProgressViewPrivate;

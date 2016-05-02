@@ -10,6 +10,69 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
+#include <QStyledItemDelegate>
+#include <QPainter>
+
+class TaskProgressViewDelegate : public QStyledItemDelegate {
+public:
+	TaskProgressViewDelegate(QObject *parent = 0) : QStyledItemDelegate(parent) {}
+	QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
+		QSize sh = QStyledItemDelegate::sizeHint(option, index);
+		sh.setHeight(sh.height()*2);
+		return sh;
+	}
+	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+		QStyleOptionViewItem opt = option;
+		opt.text = "";
+		opt.displayAlignment = Qt::AlignTop|Qt::AlignLeft;
+		QStyledItemDelegate::paint(painter, opt, index);
+		qreal progress = index.data(Qt::UserRole).toDouble();
+		if (progress < 1.0) {
+			QStyleOptionProgressBar progOpt;
+			progOpt.initFrom(opt.widget);
+			progOpt.rect = option.rect;
+			progOpt.minimum = 0;
+			progOpt.maximum = 100;
+			progOpt.progress = progress*100;
+			progOpt.rect.setTop(progOpt.rect.center().y());
+			progOpt.rect.adjust(44, 2, -4, -2);
+//			progOpt.rect.setHeight(progOpt.rect.height()/2);
+			if (option.widget) {
+				option.widget->style()->drawControl(QStyle::CE_ProgressBar, &progOpt, painter, option.widget);
+			}
+			painter->save();
+			QPen p = painter->pen();
+			QFont f = painter->font();
+			p.setColor((option.state & QStyle::State_Selected) ? Qt::white : Qt::darkGray);
+			f.setPointSize(f.pointSize()-3);
+			painter->setPen(p);
+			painter->setFont(f);
+			QRect r = option.rect;
+			r.setTop(option.rect.center().y());
+			r.adjust(4, 2, -4, -2);
+			r.setRight(40);
+
+			qreal duration = index.data(Qt::UserRole+1).toDateTime().msecsTo(QDateTime::currentDateTime()) / 1000.0;
+			painter->drawText(r, Qt::AlignLeft|Qt::AlignVCenter, QString("%1s").arg(duration));
+			painter->restore();
+		} else {
+			painter->save();
+			QPen p = painter->pen();
+			QFont f = painter->font();
+			p.setColor((option.state & QStyle::State_Selected) ? Qt::white : Qt::darkGray);
+			f.setPointSize(f.pointSize()-2);
+			painter->setPen(p);
+			painter->setFont(f);
+			QRect r = option.rect;
+			r.setTop(option.rect.center().y());
+			r.adjust(4, 2, -4, -2);
+
+			qreal duration = index.data(Qt::UserRole+1).toDateTime().msecsTo(index.data(Qt::UserRole+2).toDateTime()) / 1000.0;
+			painter->drawText(r, Qt::AlignLeft|Qt::AlignVCenter, QString("Completed in %1s").arg(duration));
+			painter->restore();
+		}
+	}
+};
 
 class TaskProgressViewPrivate {
 public:
@@ -25,16 +88,10 @@ TaskProgressView::TaskProgressView()
     d = new TaskProgressViewPrivate;
     d->q = this;
     d->m_agent = TaskProgressAgent::globalInstance();
+	setItemDelegate(new TaskProgressViewDelegate(this));
 
-    d->m_tree = new QTreeWidget;
-    d->m_tree->header()->hide();
-
-    QVBoxLayout* vlayout = new QVBoxLayout;
-    vlayout->addWidget(d->m_tree);
-    vlayout->setMargin(0);
-    vlayout->setSpacing(0);
-    this->setLayout(vlayout);
-
+	header()->hide();
+	setRootIsDecorated(false);
     connect(d->m_agent, SIGNAL(tasksChanged()), this, SLOT(slot_refresh()));
 }
 
@@ -45,13 +102,12 @@ TaskProgressView::~TaskProgressView()
 
 void TaskProgressView::slot_refresh()
 {
-    QTreeWidget* T = d->m_tree;
     TaskProgressAgent* A = d->m_agent;
 
-    T->clear();
+	clear();
     QStringList labels;
     labels << "Task";
-    T->setHeaderLabels(labels);
+	setHeaderLabels(labels);
 
     QList<TaskInfo> tasks1 = A->activeTasks();
     QList<TaskInfo> tasks2 = A->completedTasks();
@@ -60,27 +116,31 @@ void TaskProgressView::slot_refresh()
     tasks.append(tasks2);
     for (int i=0; i<tasks.count(); i++) {
         TaskInfo info=tasks[i];
+		info.description = "";
         QTreeWidgetItem* it = new QTreeWidgetItem;
+		it->setData(0, Qt::UserRole, info.progress);
+		it->setData(0, Qt::UserRole+1, info.start_time);
+		it->setData(0, Qt::UserRole+2, info.end_time);
         QString txt;
-        QString col;
+		QColor col;
         if (i<tasks1.count()) { //active
-            txt = QString("%1 (%2%) %3").arg(info.label).arg((int)(info.progress * 100)).arg(info.description);
-            col = "blue";
+			//txt = QString("%1 (%2%) %3").arg(info.label).arg((int)(info.progress * 100)).arg(info.description);
+			txt = info.label;
+			col = QColor("blue");
         }
         else {
-            txt = QString("%1 (%2 sec) %3").arg(info.label).arg(info.start_time.msecsTo(info.end_time) / 1000.0).arg(info.description);
-            col = "black";
+//            txt = QString("%1 (%2 sec) %3").arg(info.label).arg(info.start_time.msecsTo(info.end_time) / 1000.0).arg(info.description);
+			txt = info.label;
+			col = QColor();
         }
-        QLabel* label = new QLabel(d->shortened(txt, 150));
-
-        label->setStyleSheet(QString("QLabel { color: %1 }").arg(col));
-
+		if (col.isValid())
+			it->setForeground(0, col);
+		it->setText(0, txt);
         it->setToolTip(0, txt);
-        T->addTopLevelItem(it);
-        T->setItemWidget(it, 0, label);
+		addTopLevelItem(it);
     }
-    for (int i = 0; i < T->columnCount(); i++) {
-        T->resizeColumnToContents(i);
+	for (int i = 0; i < columnCount(); i++) {
+		resizeColumnToContents(i);
     }
 }
 
