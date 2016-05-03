@@ -74,11 +74,89 @@ public:
 	}
 };
 
+class TaskProgressModel : public QAbstractItemModel {
+public:
+    enum {
+        ProgressRole = Qt::UserRole,
+        StartTimeRole,
+        EndTimeRole
+    };
+    TaskProgressModel(QObject* parent = 0)
+        : QAbstractItemModel(parent)
+    {
+        m_agent = TaskProgressAgent::globalInstance();
+        connect(m_agent, &TaskProgressAgent::tasksChanged, this, &TaskProgressModel::update);
+        update();
+    }
+
+    QModelIndex index(int row, int column,
+        const QModelIndex& parent = QModelIndex()) const override
+    {
+        if (parent.isValid())
+            return QModelIndex();
+        return createIndex(row, column, -1);
+    }
+
+    QModelIndex parent(const QModelIndex& child) const override { return QModelIndex(); }
+
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override
+    {
+        if (parent.isValid())
+            return 0;
+        return m_data.size();
+    }
+
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override
+    {
+        if (parent.isValid())
+            return 0;
+        return 1;
+    }
+
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override
+    {
+        if (!index.isValid())
+            return QVariant();
+        const TaskInfo& task = m_data.at(index.row());
+        switch (role) {
+        case Qt::EditRole:
+        case Qt::DisplayRole:
+            return task.label;
+        case Qt::ToolTipRole:
+            return task.description;
+        case Qt::ForegroundRole: {
+            if (task.progress < 1)
+                return QColor(Qt::blue);
+            return QVariant();
+        }
+        case ProgressRole:
+            return task.progress;
+        case StartTimeRole:
+            return task.start_time;
+        case EndTimeRole:
+            return task.end_time;
+        }
+        return QVariant();
+    }
+
+protected:
+    void update()
+    {
+        beginResetModel();
+        m_data.clear();
+        m_data.append(m_agent->activeTasks());
+        m_data.append(m_agent->completedTasks());
+        endResetModel();
+    }
+
+private:
+    QList<TaskInfo> m_data;
+    TaskProgressAgent* m_agent;
+};
+
 class TaskProgressViewPrivate {
 public:
     TaskProgressView* q;
-    TaskProgressAgent* m_agent;
-    QTreeWidget* m_tree;
 
     QString shortened(QString txt, int maxlen);
 };
@@ -87,61 +165,16 @@ TaskProgressView::TaskProgressView()
 {
     d = new TaskProgressViewPrivate;
     d->q = this;
-    d->m_agent = TaskProgressAgent::globalInstance();
 	setItemDelegate(new TaskProgressViewDelegate(this));
-
+    TaskProgressModel *model = new TaskProgressModel(this);
+    setModel(model);
 	header()->hide();
 	setRootIsDecorated(false);
-    connect(d->m_agent, SIGNAL(tasksChanged()), this, SLOT(slot_refresh()));
 }
 
 TaskProgressView::~TaskProgressView()
 {
     delete d;
-}
-
-void TaskProgressView::slot_refresh()
-{
-    TaskProgressAgent* A = d->m_agent;
-
-	clear();
-    QStringList labels;
-    labels << "Task";
-	setHeaderLabels(labels);
-
-    QList<TaskInfo> tasks1 = A->activeTasks();
-    QList<TaskInfo> tasks2 = A->completedTasks();
-    QList<TaskInfo> tasks;
-    tasks.append(tasks1);
-    tasks.append(tasks2);
-    for (int i=0; i<tasks.count(); i++) {
-        TaskInfo info=tasks[i];
-		info.description = "";
-        QTreeWidgetItem* it = new QTreeWidgetItem;
-		it->setData(0, Qt::UserRole, info.progress);
-		it->setData(0, Qt::UserRole+1, info.start_time);
-		it->setData(0, Qt::UserRole+2, info.end_time);
-        QString txt;
-		QColor col;
-        if (i<tasks1.count()) { //active
-			//txt = QString("%1 (%2%) %3").arg(info.label).arg((int)(info.progress * 100)).arg(info.description);
-			txt = info.label;
-			col = QColor("blue");
-        }
-        else {
-//            txt = QString("%1 (%2 sec) %3").arg(info.label).arg(info.start_time.msecsTo(info.end_time) / 1000.0).arg(info.description);
-			txt = info.label;
-			col = QColor();
-        }
-		if (col.isValid())
-			it->setForeground(0, col);
-		it->setText(0, txt);
-        it->setToolTip(0, txt);
-		addTopLevelItem(it);
-    }
-	for (int i = 0; i < columnCount(); i++) {
-		resizeColumnToContents(i);
-    }
 }
 
 QString TaskProgressViewPrivate::shortened(QString txt, int maxlen)

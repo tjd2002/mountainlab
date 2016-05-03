@@ -7,17 +7,15 @@
 #ifndef TASKPROGRESSVIEW_H
 #define TASKPROGRESSVIEW_H
 
-#include <QTreeWidget>
+#include <QTreeView>
 
 class TaskProgressViewPrivate;
-class TaskProgressView : public QTreeWidget {
+class TaskProgressView : public QTreeView {
     Q_OBJECT
 public:
     friend class TaskProgressViewPrivate;
     TaskProgressView();
     virtual ~TaskProgressView();
-private slots:
-    void slot_refresh();
 
 private:
     TaskProgressViewPrivate* d;
