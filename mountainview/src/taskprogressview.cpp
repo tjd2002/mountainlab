@@ -12,6 +12,7 @@
 #include <QLabel>
 #include <QStyledItemDelegate>
 #include <QPainter>
+#include <QtDebug>
 
 class TaskProgressViewDelegate : public QStyledItemDelegate {
 public:
@@ -22,6 +23,10 @@ public:
 		return sh;
 	}
 	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+        if (index.internalId() != 0xDEADBEEF) {
+            QStyledItemDelegate::paint(painter, option, index);
+            return;
+        }
 		QStyleOptionViewItem opt = option;
 		opt.text = "";
 		opt.displayAlignment = Qt::AlignTop|Qt::AlignLeft;
@@ -92,24 +97,34 @@ public:
     QModelIndex index(int row, int column,
         const QModelIndex& parent = QModelIndex()) const override
     {
-        if (parent.isValid())
-            return QModelIndex();
-        return createIndex(row, column, -1);
+        if (parent.isValid() && parent.internalId() != 0xDEADBEEF) return QModelIndex();
+        if (parent.isValid()) {
+            return createIndex(row, column, parent.row());
+        }
+        return createIndex(row, column, 0xDEADBEEF);
     }
 
-    QModelIndex parent(const QModelIndex& child) const override { return QModelIndex(); }
+    QModelIndex parent(const QModelIndex& child) const override {
+        if (child.internalId() == 0xDEADBEEF)
+            return QModelIndex();
+        return createIndex(child.internalId(), 0, 0xDEADBEEF);
+    }
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override
     {
-        if (parent.isValid())
+        if (parent.isValid() && parent.internalId() != 0xDEADBEEF)
             return 0;
+        if (parent.isValid()) {
+            if (parent.row() < 0) return 0;
+            return m_data.at(parent.row()).log_messages.size();
+        }
         return m_data.size();
     }
 
     int columnCount(const QModelIndex& parent = QModelIndex()) const override
     {
         if (parent.isValid())
-            return 0;
+            return 1; // 2
         return 1;
     }
 
@@ -117,6 +132,19 @@ public:
     {
         if (!index.isValid())
             return QVariant();
+        if (index.parent().isValid()) {
+            const TaskInfo& task = m_data.at(index.internalId());
+            const auto &logMessages = task.log_messages;
+            auto logMessage = logMessages.at(index.row());
+            switch (role) {
+            case Qt::EditRole:
+            case Qt::DisplayRole:
+                return logMessage.message;
+            case Qt::UserRole:
+                return logMessage.time;
+            default: return QVariant();
+            }
+        }
         const TaskInfo& task = m_data.at(index.row());
         switch (role) {
         case Qt::EditRole:
@@ -169,7 +197,7 @@ TaskProgressView::TaskProgressView()
     TaskProgressModel *model = new TaskProgressModel(this);
     setModel(model);
 	header()->hide();
-	setRootIsDecorated(false);
+//	setRootIsDecorated(false);
 }
 
 TaskProgressView::~TaskProgressView()
