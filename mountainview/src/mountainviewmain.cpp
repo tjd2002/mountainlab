@@ -60,6 +60,88 @@ void test_histogramview()
     W->show();
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+#include <QThread>
+class TestThread : public QThread {
+public:
+    TestThread() { sum = 0; }
+    void run()
+    {
+        double sum = 0;
+        for (long j = 0; j < N1; j++) {
+            TP.setProgress((j + 1) * 1.0 / N1);
+            TP.log(QString("j=%1").arg(j));
+            TP.setDescription(QString("This is the description of what is happening at step %1 (sum=%2)").arg(j).arg(sum));
+            for (long k = 0; k < N2; k++) {
+                sum += sin(ind * j + sin(ind * k));
+            }
+        }
+        QString str = QString("sum for task %1 is %2").arg(ind).arg(sum);
+        TP.setDescription(str);
+        qDebug()  << str;
+    }
+    TaskProgress TP;
+    double sum;
+    long ind;
+    long N1, N2;
+};
+int num_completed(QList<TestThread*>& threads)
+{
+    int ret = 0;
+    foreach (TestThread* T, threads) {
+        if (T->isFinished())
+            ret++;
+    }
+    return ret;
+}
+int num_running(QList<TestThread*>& threads)
+{
+    int ret = 0;
+    foreach (TestThread* T, threads) {
+        if (T->isRunning())
+            ret++;
+    }
+    return ret;
+}
+void start_another(QList<TestThread*>& threads)
+{
+    foreach (TestThread* T, threads) {
+        if ((!T->isRunning()) && (!T->isFinished())) {
+            T->start();
+            return;
+        }
+    }
+}
+void test_taskprogressview()
+{
+    TaskProgress TP1("Test task", "The description of the task. This should complete on destruct.");
+
+    int num_jobs = 30; //can increase to test a large number of jobs
+    long N1 = 5000;
+    long N2 = 5000;
+
+    /// Witold for now I need to construct the TaskProgress instances in the main thread, because of the way that TaskProgress interacts with TaskProgressAgent. However, I would love/need to be able to instantiate TaskProgress from within any thread.
+    QList<TestThread*> threads;
+    for (int ind = 1; ind <= num_jobs; ind++) {
+        TestThread* thr = new TestThread;
+        thr->ind = ind;
+        thr->N1 = N1;
+        thr->N2 = N2;
+        thr->TP.setLabel(QString("Task %1 of %2").arg(ind).arg(num_jobs));
+        thr->TP.setDescription(QString("Description of task %1 of %2").arg(ind).arg(num_jobs));
+        threads << thr;
+    }
+
+    while (num_completed(threads) < num_jobs) {
+        if (num_running(threads) < 5) {
+            start_another(threads);
+        }
+        qApp->processEvents();
+    }
+    qDeleteAll(threads);
+}
+////////////////////////////////////////////////////////////////////////////////
+
 void run_export_instructions(MVOverview2Widget* W, const QStringList& instructions);
 
 int main(int argc, char* argv[])
@@ -67,7 +149,6 @@ int main(int argc, char* argv[])
     QApplication a(argc, argv);
     CloseMeHandler::start();
 
-    //Witold, I don't want to do this here! What can I do?
     qRegisterMetaType<TaskInfo>();
 
     CLParams CLP = get_command_line_params(argc, argv);
@@ -77,8 +158,12 @@ int main(int argc, char* argv[])
         return run_mountainview_script(script, CLP.named_parameters);
     }
 
+    QString mode = CLP.named_parameters.value("mode", "overview2").toString();
+
     if (CLP.unnamed_parameters.value(0) == "unit_test") {
         QString arg2 = CLP.unnamed_parameters.value(1);
+        mode = "unit_test";
+        /*
         if (arg2 == "remotereadmda") {
             unit_test_remote_read_mda();
         }
@@ -86,13 +171,28 @@ int main(int argc, char* argv[])
             QString arg3 = CLP.unnamed_parameters.value(2, "http://localhost:8000/firings.mda");
             unit_test_remote_read_mda_2(arg3);
         }
+        */
+        if (arg2 == "taskprogressview") {
+            MVOverview2Widget* W = new MVOverview2Widget;
+            W->show();
+            W->move(QApplication::desktop()->screen()->rect().topLeft() + QPoint(200, 200));
+            int W0 = 1400, H0 = 1000;
+            QRect geom = QApplication::desktop()->geometry();
+            if ((geom.width() - 100 < W0) || (geom.height() - 100 < H0)) {
+                //W->showMaximized();
+                W->resize(geom.width() - 100, geom.height() - 100);
+            }
+            else {
+                W->resize(W0, H0);
+            }
+            test_taskprogressview();
+        }
         else {
             qWarning() << "No such unit test: " + arg2;
+            return -1;
         }
-        return 0;
     }
 
-    QString mode = CLP.named_parameters.value("mode", "overview2").toString();
     if ((mode == "overview2") || (mode == "export_image") || (mode == "export_images")) {
         printf("overview2...\n");
         QString raw_path = CLP.named_parameters["raw"].toString();
