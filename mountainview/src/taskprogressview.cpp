@@ -31,7 +31,7 @@ public:
 		return sh;
 	}
 	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-        if (index.internalId() != 0xDEADBEEF) {
+        if (index.internalId() != 0xDEADBEEF || index.column() != 0) {
             QStyledItemDelegate::paint(painter, option, index);
             return;
         }
@@ -100,6 +100,9 @@ public:
         LogRole,
         IndentedLogRole
     };
+    enum {
+        InvalidId = 0xDEADBEEF
+    };
     TaskProgressModel(QObject* parent = 0)
         : QAbstractItemModel(parent)
     {
@@ -111,22 +114,22 @@ public:
     QModelIndex index(int row, int column,
         const QModelIndex& parent = QModelIndex()) const override
     {
-        if (parent.isValid() && parent.internalId() != 0xDEADBEEF) return QModelIndex();
+        if (parent.isValid() && parent.internalId() != InvalidId) return QModelIndex();
         if (parent.isValid()) {
             return createIndex(row, column, parent.row());
         }
-        return createIndex(row, column, 0xDEADBEEF);
+        return createIndex(row, column, InvalidId);
     }
 
     QModelIndex parent(const QModelIndex& child) const override {
-        if (child.internalId() == 0xDEADBEEF)
+        if (child.internalId() == InvalidId)
             return QModelIndex();
-        return createIndex(child.internalId(), 0, 0xDEADBEEF);
+        return createIndex(child.internalId(), 0, InvalidId);
     }
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override
     {
-        if (parent.isValid() && parent.internalId() != 0xDEADBEEF)
+        if (parent.isValid() && parent.internalId() != InvalidId)
             return 0;
         if (parent.isValid()) {
             if (parent.row() < 0) return 0;
@@ -138,8 +141,8 @@ public:
     int columnCount(const QModelIndex& parent = QModelIndex()) const override
     {
         if (parent.isValid())
-            return 1; // 2
-        return 1;
+            return 2; // 2
+        return 2;
     }
 
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override
@@ -159,6 +162,8 @@ public:
         switch (role) {
         case Qt::EditRole:
         case Qt::DisplayRole:
+            if (index.column() == 0)
+                return logMessage.time;
             return logMessage.message;
         case Qt::UserRole:
             return logMessage.time;
@@ -170,6 +175,7 @@ public:
         }
     }
     QVariant taskData(const QModelIndex &index, int role = Qt::DisplayRole) const {
+        if(index.column() !=0) return QVariant();
         const TaskInfo& task = m_data.at(index.row());
         switch (role) {
         case Qt::EditRole:
@@ -237,11 +243,15 @@ TaskProgressView::TaskProgressView()
 	setItemDelegate(new TaskProgressViewDelegate(this));
     TaskProgressModel *model = new TaskProgressModel(this);
     setModel(model);
-	header()->hide();
-//	setRootIsDecorated(false);
+    header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    header()->hide();
     connect(this, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(showLogMessages(QModelIndex)));
     QShortcut *copyToClipboard = new QShortcut(QKeySequence(QKeySequence::Copy), this);
     connect(copyToClipboard, SIGNAL(activated()), this, SLOT(copySelectedToClipboard()));
+    connect(model, &QAbstractItemModel::modelReset, [this, model](){
+        for(int i = 0; i < model->rowCount(); ++i)
+            this->setFirstColumnSpanned(i, QModelIndex(), true);
+    });
 }
 
 TaskProgressView::~TaskProgressView()
