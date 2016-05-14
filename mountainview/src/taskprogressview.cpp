@@ -41,6 +41,12 @@ public:
 		QStyledItemDelegate::paint(painter, opt, index);
 		qreal progress = index.data(Qt::UserRole).toDouble();
 		if (progress < 1.0) {
+            QPen p = painter->pen();
+            QFont f = painter->font();
+            p.setColor((option.state & QStyle::State_Selected) ? Qt::white : Qt::darkGray);
+            f.setPointSize(f.pointSize()-3);
+            QFontMetrics smallFm(f);
+            int elapsedWidth = smallFm.width("MMMMM");
 			QStyleOptionProgressBar progOpt;
 			progOpt.initFrom(opt.widget);
 			progOpt.rect = option.rect;
@@ -48,25 +54,23 @@ public:
 			progOpt.maximum = 100;
 			progOpt.progress = progress*100;
 			progOpt.rect.setTop(progOpt.rect.center().y());
-			progOpt.rect.adjust(44, 2, -4, -2);
-//			progOpt.rect.setHeight(progOpt.rect.height()/2);
+            progOpt.rect.adjust(4+elapsedWidth+4, 2, -4, -2);
 			if (option.widget) {
 				option.widget->style()->drawControl(QStyle::CE_ProgressBar, &progOpt, painter, option.widget);
 			}
 			painter->save();
-			QPen p = painter->pen();
-			QFont f = painter->font();
-			p.setColor((option.state & QStyle::State_Selected) ? Qt::white : Qt::darkGray);
-			f.setPointSize(f.pointSize()-3);
 			painter->setPen(p);
 			painter->setFont(f);
 			QRect r = option.rect;
 			r.setTop(option.rect.center().y());
 			r.adjust(4, 2, -4, -2);
-			r.setRight(40);
+            r.setRight(r.left()+elapsedWidth);
 
 			qreal duration = index.data(Qt::UserRole+1).toDateTime().msecsTo(QDateTime::currentDateTime()) / 1000.0;
-			painter->drawText(r, Qt::AlignLeft|Qt::AlignVCenter, QString("%1s").arg(duration));
+            if (duration < 100)
+                painter->drawText(r, Qt::AlignRight|Qt::AlignVCenter, QString("%1s").arg(duration, 0, 'f', 2));
+            else
+                painter->drawText(r, Qt::AlignRight|Qt::AlignVCenter, QString("%1s").arg(qRound(duration)));
 			painter->restore();
 		} else {
 			painter->save();
