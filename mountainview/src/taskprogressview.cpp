@@ -13,11 +13,19 @@
 #include <QStyledItemDelegate>
 #include <QPainter>
 #include <QtDebug>
+#include <QPlainTextEdit>
+#include <QDialogButtonBox>
+#include <QDialog>
+#include <QShortcut>
+#include <QApplication>
+#include <QClipboard>
 
 class TaskProgressViewDelegate : public QStyledItemDelegate {
 public:
 	TaskProgressViewDelegate(QObject *parent = 0) : QStyledItemDelegate(parent) {}
 	QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
+        if (index.parent().isValid())
+            return QStyledItemDelegate::sizeHint(option, index);
 		QSize sh = QStyledItemDelegate::sizeHint(option, index);
 		sh.setHeight(sh.height()*2);
 		return sh;
@@ -84,7 +92,9 @@ public:
     enum {
         ProgressRole = Qt::UserRole,
         StartTimeRole,
-        EndTimeRole
+        EndTimeRole,
+        LogRole,
+        IndentedLogRole
     };
     TaskProgressModel(QObject* parent = 0)
         : QAbstractItemModel(parent)
@@ -133,18 +143,29 @@ public:
         if (!index.isValid())
             return QVariant();
         if (index.parent().isValid()) {
-            const TaskInfo& task = m_data.at(index.internalId());
-            const auto &logMessages = task.log_messages;
-            auto logMessage = logMessages.at(index.row());
-            switch (role) {
-            case Qt::EditRole:
-            case Qt::DisplayRole:
-                return logMessage.message;
-            case Qt::UserRole:
-                return logMessage.time;
-            default: return QVariant();
-            }
+            return logData(index, role);
         }
+        return taskData(index, role);
+    }
+
+    QVariant logData(const QModelIndex &index, int role = Qt::DisplayRole) const {
+        const TaskInfo& task = m_data.at(index.internalId());
+        const auto &logMessages = task.log_messages;
+        auto logMessage = logMessages.at(logMessages.count() - 1 - index.row()); // newest first
+        switch (role) {
+        case Qt::EditRole:
+        case Qt::DisplayRole:
+            return logMessage.message;
+        case Qt::UserRole:
+            return logMessage.time;
+        case LogRole:
+            return singleLog(logMessage);
+        case IndentedLogRole:
+            return singleLog(logMessage, "\t");
+        default: return QVariant();
+        }
+    }
+    QVariant taskData(const QModelIndex &index, int role = Qt::DisplayRole) const {
         const TaskInfo& task = m_data.at(index.row());
         switch (role) {
         case Qt::EditRole:
@@ -163,6 +184,10 @@ public:
             return task.start_time;
         case EndTimeRole:
             return task.end_time;
+        case LogRole:
+            return assembleLog(task);
+        case IndentedLogRole:
+            return assembleLog(task, "\t");
         }
         return QVariant();
     }
@@ -175,6 +200,17 @@ protected:
         m_data.append(m_agent->activeTasks());
         m_data.append(m_agent->completedTasks());
         endResetModel();
+    }
+
+    QString assembleLog(const TaskInfo &task, const QString &prefix = QString()) const {
+        QStringList entries;
+        foreach(const TaskProgressLogMessage &msg, task.log_messages) {
+            entries << singleLog(msg, prefix);
+        }
+        return entries.join("\n");
+    }
+    QString singleLog(const TaskProgressLogMessage &msg, const QString &prefix = QString()) const {
+        return QString("%1%2: %3").arg(prefix).arg(msg.time.toString(Qt::ISODate)).arg(msg.message);
     }
 
 private:
@@ -193,16 +229,67 @@ TaskProgressView::TaskProgressView()
 {
     d = new TaskProgressViewPrivate;
     d->q = this;
+    setSelectionMode(ContiguousSelection);
 	setItemDelegate(new TaskProgressViewDelegate(this));
     TaskProgressModel *model = new TaskProgressModel(this);
     setModel(model);
 	header()->hide();
 //	setRootIsDecorated(false);
+    connect(this, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(showLogMessages(QModelIndex)));
+    QShortcut *copyToClipboard = new QShortcut(QKeySequence(QKeySequence::Copy), this);
+    connect(copyToClipboard, SIGNAL(activated()), this, SLOT(copySelectedToClipboard()));
 }
 
 TaskProgressView::~TaskProgressView()
 {
     delete d;
+}
+
+void TaskProgressView::copySelectedToClipboard()
+{
+    QItemSelectionModel *selectionModel = this->selectionModel();
+    const auto selRows = selectionModel->selectedRows();
+    if (selRows.isEmpty()) return;
+    // if first selected entry is a task, we ignore all non-tasks
+    bool selectingTasks = !selRows.first().parent().isValid();
+    QStringList result;
+    QModelIndex lastTask;
+    foreach(QModelIndex row, selRows) {
+        if (selectingTasks == row.parent().isValid()) continue;
+        if (selectingTasks) {
+            // for each task get the name of the task
+            result << row.data().toString();
+            // for each task get its log messages
+            result << row.data(TaskProgressModel::IndentedLogRole).toString();
+        } else {
+            // for each log see if it belongs to the previos task
+            // if not, add the task name to the log
+            if (row.parent() != lastTask) {
+                result << row.parent().data().toString();
+                lastTask = row.parent();
+            }
+             result << row.data(TaskProgressModel::IndentedLogRole).toString();
+        }
+    }
+    QApplication::clipboard()->setText(result.join("\n"));
+}
+
+void TaskProgressView::showLogMessages(const QModelIndex &index)
+{
+    if (index.parent().isValid()) return;
+    QDialog dlg(this);
+    dlg.setWindowTitle(tr("Log messages for %1").arg(index.data().toString()));
+    QPlainTextEdit *te = new QPlainTextEdit;
+    te->setReadOnly(true);
+    QDialogButtonBox *bb = new QDialogButtonBox;
+    QObject::connect(bb, SIGNAL(accepted()), &dlg, SLOT(accept()));
+    QObject::connect(bb, SIGNAL(rejected()), &dlg, SLOT(reject()));
+    bb->setStandardButtons(QDialogButtonBox::Close);
+    QVBoxLayout *l = new QVBoxLayout(&dlg);
+    l->addWidget(te);
+    l->addWidget(bb);
+    te->setPlainText(index.data(TaskProgressModel::LogRole).toString());
+    dlg.exec();
 }
 
 QString TaskProgressViewPrivate::shortened(QString txt, int maxlen)

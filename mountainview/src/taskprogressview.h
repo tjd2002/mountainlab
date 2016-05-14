@@ -16,7 +16,9 @@ public:
     friend class TaskProgressViewPrivate;
     TaskProgressView();
     virtual ~TaskProgressView();
-
+public slots:
+    void copySelectedToClipboard();
+    void showLogMessages(const QModelIndex &index);
 private:
     TaskProgressViewPrivate* d;
 };
