@@ -33,6 +33,9 @@ TaskProgress::TaskProgress(const QString& label, const QString& description)
     d = new TaskProgressPrivate;
     d->q = this;
 
+    static int taskInfoMetaTypeId = qRegisterMetaType<TaskInfo>();
+    Q_UNUSED(taskInfoMetaTypeId);
+
     d->m_info.label = label;
     d->m_info.description = description;
     d->m_info.progress = 0;
