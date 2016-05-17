@@ -19,6 +19,7 @@
 #include <QShortcut>
 #include <QApplication>
 #include <QClipboard>
+#include <QDesktopWidget>
 
 class TaskProgressViewDelegate : public QStyledItemDelegate {
 public:
@@ -295,6 +296,9 @@ void TaskProgressView::showLogMessages(const QModelIndex &index)
     QDialog dlg(this);
     dlg.setWindowTitle(tr("Log messages for %1").arg(index.data().toString()));
     QPlainTextEdit *te = new QPlainTextEdit;
+    QFont f;
+    f.setPointSize(f.pointSize()-2);
+    te->setFont(f);
     te->setReadOnly(true);
     QDialogButtonBox *bb = new QDialogButtonBox;
     QObject::connect(bb, SIGNAL(accepted()), &dlg, SLOT(accept()));
@@ -304,6 +308,10 @@ void TaskProgressView::showLogMessages(const QModelIndex &index)
     l->addWidget(te);
     l->addWidget(bb);
     te->setPlainText(index.data(TaskProgressModel::LogRole).toString());
+    QRect r = QApplication::desktop()->screenGeometry(&dlg);
+    r.setWidth(r.width()/2);
+    r.setHeight(r.height()/2);
+    dlg.resize(r.size());
     dlg.exec();
 }
 
