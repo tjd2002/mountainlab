@@ -245,6 +245,7 @@ TaskProgressView::TaskProgressView()
     setModel(model);
     header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     header()->hide();
+    setExpandsOnDoubleClick(false);
     connect(this, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(showLogMessages(QModelIndex)));
     QShortcut *copyToClipboard = new QShortcut(QKeySequence(QKeySequence::Copy), this);
     connect(copyToClipboard, SIGNAL(activated()), this, SLOT(copySelectedToClipboard()));
