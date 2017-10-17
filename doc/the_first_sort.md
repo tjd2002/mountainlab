@@ -8,7 +8,7 @@
 
 ### A note about processing
 
-MountainLab processing is defined in layers. This tutorial shows the recommended way to do the processing. However you are by no means restricted to doing it this way -- for example, the need to launch a processing daemon may seem like overkill. All processing routines may be traced back to simple executables. An explanation of the processing layers and different ways to invoke spike sorting is found [processing layers](processing_layers.md).
+MountainLab processing is defined in layers. This tutorial shows the recommended way to do the processing. However you are by no means restricted to doing it this way -- for example, the need to launch a processing daemon may seem like overkill. All processing routines may be traced back to simple executables. An explanation of the processing layers and different ways to invoke spike sorting is found at [processing layers](processing_layers.md).
 
 ### 1. Install and configure MountainLab
 
@@ -155,7 +155,7 @@ Then launch the sorting using:
 
 The output will go into the outputs/ms2–ds1 folder. In particular you will get a firings.mda file, which is [described here](mda_format.md).
 
-Further description of the daemon is found [here](procesing_layers.md).
+Further description of the daemon is found [here](processing_layers.md).
 
 ### 5. View the results
 
