@@ -155,7 +155,7 @@ Then launch the sorting using:
 
 The output will go into the outputs/ms2–ds1 folder. In particular you will get a firings.mda file, which is [described here](mda_format.md).
 
-Further description of the daemon is found [here](procesing_layers.md).
+Further description of the daemon is found [here](processing_layers.md).
 
 ### 5. View the results
 
